@@ -22,7 +22,7 @@ import br.unesp.exemplo.entities.enums.TamanhoCamiseta;
  * @author Alessandro Moraes
  */
 @Entity
-@Table(name="perfil", schema="central")
+@Table(name="inscricao", schema="exemplo")
 public class Inscricao implements Serializable {
 	private static final long serialVersionUID = 8853148012477575858L;
 

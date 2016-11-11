@@ -1,4 +1,4 @@
-package br.unesp.exemplo.util;
+package br.unesp.exemplo.utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
