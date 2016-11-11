@@ -9,7 +9,7 @@ import br.unesp.exemplo.KGlobal;
 
 public class TestHelper {
 	
-	public static String convertObjectToJsonBytes(Object object) throws IOException {
+	public static String convertObjectToJsonString(Object object) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         return mapper.writeValueAsString(object);

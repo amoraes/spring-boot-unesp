@@ -5,8 +5,10 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -53,13 +55,13 @@ public class InscricaoControllerTest {
 	private InscricaoService inscricaoService;
 	
 	@InjectMocks
-	private EventoController eventoController;
+	private InscricaoController inscricaoController;
 	
 	@Before
 	public void init(){
 		MockitoAnnotations.initMocks(this);
 		RestErrorsControllerAdvice advice = new RestErrorsControllerAdvice();
-		this.mockMvc = standaloneSetup(eventoController)
+		this.mockMvc = standaloneSetup(inscricaoController)
 				.setControllerAdvice(advice)
 			.build();
 	}
@@ -145,7 +147,7 @@ public class InscricaoControllerTest {
 	}
 	
 	/**
-	 * buscarPorId: verifica se retorna nulo para inscrição inexistente
+	 * buscarPorId: verifica se retorna erro para inscrição inexistente
 	 */	
 	@Test
 	public void testBuscarPorIdEventoInexistente() throws Exception{
@@ -158,7 +160,7 @@ public class InscricaoControllerTest {
 	}
 	
 	/**
-	 * buscarPorId: verifica se retorna nulo para inscrição inexistente
+	 * buscarPorId: verifica se retorna erro para inscrição inexistente
 	 */	
 	@Test
 	public void testBuscarPorIdInexistente() throws Exception{
@@ -169,6 +171,23 @@ public class InscricaoControllerTest {
 		this.mockMvc.perform(get(BASE_URL+"/{idInscricao}",evento.getId(),idInscricao)
 			.accept(KGlobal.APPLICATION_JSON_UTF8))
 			.andExpect(status().isNotFound());
+	}
+	
+	/**
+	 * buscarPorId: verifica se retorna erro para inscrição vinculada a outro evento
+	 */	
+	@Test
+	public void testBuscarPorIdVinculoErrado() throws Exception{
+		Evento evento = new EventoDummy();
+		Inscricao inscricao = new InscricaoDummy(evento);
+		Evento outroEvento = new EventoDummy();
+		outroEvento.setId(2L);
+		
+		when(eventoService.buscarPorId(outroEvento.getId())).thenReturn(outroEvento);
+		when(inscricaoService.buscarPorId(inscricao.getId())).thenReturn(inscricao);
+		this.mockMvc.perform(get(BASE_URL+"/{idInscricao}",outroEvento.getId(),inscricao.getId())
+			.accept(KGlobal.APPLICATION_JSON_UTF8))
+			.andExpect(status().isBadRequest());
 	}
 	
 	/**
@@ -188,9 +207,9 @@ public class InscricaoControllerTest {
 		when(eventoService.buscarPorId(evento.getId())).thenReturn(evento);
 		when(inscricaoService.salvar(any())).thenReturn(inscricao);
 		this.mockMvc
-			.perform(post(BASE_URL)
+			.perform(post(BASE_URL+"/", evento.getId())
 					.contentType(KGlobal.APPLICATION_JSON_UTF8)
-					.content(TestHelper.convertObjectToJsonBytes(inscricaoVO))	
+					.content(TestHelper.convertObjectToJsonString(inscricaoVO))	
 					)
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.idInscricao", equalTo(inscricao.getId().intValue())))
@@ -201,7 +220,7 @@ public class InscricaoControllerTest {
 				.andExpect(jsonPath("$.tamanhoCamiseta", equalTo(inscricao.getTamanhoCamiseta().name())))
 				.andExpect(jsonPath("$.tamanhoCamisetaDescricao", equalTo(inscricao.getTamanhoCamiseta().getDescricao())))
 				;
-		verify(eventoService, atLeastOnce()).salvar(any());
+		verify(inscricaoService, atLeastOnce()).salvar(any());
 	}
 	
 	/**
@@ -209,19 +228,23 @@ public class InscricaoControllerTest {
 	 */	
 	@Test
 	public void testInserirCamposInvalidos() throws Exception{
-		
-		//vo para post sem campos requeridos
-		EventoVOPost eventoVO = new EventoVOPost();
-		eventoVO.setTitulo("Apenas o título");			
+		Evento evento = new EventoDummy();
+		Inscricao inscricao = new InscricaoDummy(evento);
+		//vo para post
+		InscricaoVOPost inscricaoVO = new InscricaoVOPost();
+		inscricaoVO.setCpf(null);
+		inscricaoVO.setNome(inscricao.getNome());
+		inscricaoVO.setEmail(inscricao.getEmail());
+		inscricaoVO.setTamanhoCamiseta(inscricao.getTamanhoCamiseta().name());		
 		
 		this.mockMvc
-			.perform(post(BASE_URL)
+			.perform(post(BASE_URL+"/", evento.getId())
 					.contentType(KGlobal.APPLICATION_JSON_UTF8)
-					.content(TestHelper.convertObjectToJsonBytes(eventoVO))	
+					.content(TestHelper.convertObjectToJsonString(inscricaoVO))	
 					)
 				.andExpect(status().isUnprocessableEntity())
 				.andExpect(jsonPath("$.code", equalTo(InvalidEntityException.class.getSimpleName())));
-		
+		verify(inscricaoService, never()).salvar(any());
 	}
 	
 	/**
@@ -229,28 +252,62 @@ public class InscricaoControllerTest {
 	 */	
 	@Test
 	public void testAtualizar() throws Exception{
-		//entity para retorno do service
 		Evento evento = new EventoDummy();
-		//vo para put
-		EventoVOPut eventoVO = new EventoVOPut();
-		eventoVO.setTitulo(evento.getTitulo());
-		eventoVO.setLocal(evento.getLocal());
-		eventoVO.setEmail(evento.getEmail());
-		eventoVO.setInicio(evento.getInicio());
-		eventoVO.setTermino(evento.getTermino());
-		eventoVO.setInicioInscricao(evento.getInicioInscricao());
-		eventoVO.setTerminoInscricao(evento.getTerminoInscricao());
-		
+		Inscricao inscricao = new InscricaoDummy(evento);
+		//vo para post
+		InscricaoVOPost inscricaoVO = new InscricaoVOPost();
+		inscricaoVO.setCpf(inscricao.getCpf());
+		inscricaoVO.setNome(inscricao.getNome());
+		inscricaoVO.setEmail(inscricao.getEmail());
+		inscricaoVO.setTamanhoCamiseta(inscricao.getTamanhoCamiseta().name());
+				
 		when(eventoService.buscarPorId(evento.getId())).thenReturn(evento);
-		when(eventoService.salvar(any())).thenReturn(evento);
+		when(inscricaoService.buscarPorId(inscricao.getId())).thenReturn(inscricao);
+		when(inscricaoService.salvar(any())).thenReturn(inscricao);
 		this.mockMvc
-			.perform(put(BASE_URL+"/{idEvento}",evento.getId())
+			.perform(put(BASE_URL+"/{idInscricao}", evento.getId(), inscricao.getId())
 					.contentType(KGlobal.APPLICATION_JSON_UTF8)
-					.content(TestHelper.convertObjectToJsonBytes(eventoVO))	
+					.content(TestHelper.convertObjectToJsonString(inscricaoVO))	
 					)
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.idEvento", equalTo(new Long(evento.getId()).intValue())));
-		verify(eventoService, atLeastOnce()).salvar(any());
+				.andExpect(jsonPath("$.idInscricao", equalTo(inscricao.getId().intValue())))
+				.andExpect(jsonPath("$.idEvento", equalTo(evento.getId().intValue())))
+				.andExpect(jsonPath("$.cpf", equalTo(inscricao.getCpf())))
+				.andExpect(jsonPath("$.nome", equalTo(inscricao.getNome())))
+				.andExpect(jsonPath("$.email", equalTo(inscricao.getEmail())))
+				.andExpect(jsonPath("$.tamanhoCamiseta", equalTo(inscricao.getTamanhoCamiseta().name())))
+				.andExpect(jsonPath("$.tamanhoCamisetaDescricao", equalTo(inscricao.getTamanhoCamiseta().getDescricao())))
+				;
+		verify(inscricaoService, atLeastOnce()).salvar(any());
+	}
+	
+	/**
+	 * atualizar: verifica se lança erro ao atualizar inscricao de outro evento
+	 */	
+	@Test
+	public void testAtualizarErroVinculo() throws Exception{
+		Evento evento = new EventoDummy();
+		Inscricao inscricao = new InscricaoDummy(evento);
+		//vo para post
+		InscricaoVOPost inscricaoVO = new InscricaoVOPost();
+		inscricaoVO.setCpf(inscricao.getCpf());
+		inscricaoVO.setNome(inscricao.getNome());
+		inscricaoVO.setEmail(inscricao.getEmail());
+		inscricaoVO.setTamanhoCamiseta(inscricao.getTamanhoCamiseta().name());
+		Evento outroEvento = new EventoDummy();
+		outroEvento.setId(2L);
+				
+		when(eventoService.buscarPorId(outroEvento.getId())).thenReturn(outroEvento);
+		when(inscricaoService.buscarPorId(inscricao.getId())).thenReturn(inscricao);
+		this.mockMvc
+			.perform(put(BASE_URL+"/{idInscricao}", outroEvento.getId(), inscricao.getId())
+					.contentType(KGlobal.APPLICATION_JSON_UTF8)
+					.content(TestHelper.convertObjectToJsonString(inscricaoVO))	
+					)
+				.andExpect(status().isBadRequest())
+				;
+		
+		verify(inscricaoService, never()).salvar(any());
 	}
 	
 	/**
@@ -258,24 +315,49 @@ public class InscricaoControllerTest {
 	 */	
 	@Test
 	public void testAtualizarEventoInexistente() throws Exception{
-		//entity para retorno do service
 		Evento evento = new EventoDummy();
-		//vo para put
-		EventoVOPut eventoVO = new EventoVOPut();
-		eventoVO.setTitulo(evento.getTitulo());
-		eventoVO.setLocal(evento.getLocal());
-		eventoVO.setEmail(evento.getEmail());
-		eventoVO.setInicio(evento.getInicio());
-		eventoVO.setTermino(evento.getTermino());
-		eventoVO.setInicioInscricao(evento.getInicioInscricao());
-		eventoVO.setTerminoInscricao(evento.getTerminoInscricao());
-		when(eventoService.buscarPorId(evento.getId())).thenReturn(null); //null <-- o service não encontrou o evento no banco de dados
+		Inscricao inscricao = new InscricaoDummy(evento);
+		//vo para post
+		InscricaoVOPost inscricaoVO = new InscricaoVOPost();
+		inscricaoVO.setCpf(inscricao.getCpf());
+		inscricaoVO.setNome(inscricao.getNome());
+		inscricaoVO.setEmail(inscricao.getEmail());
+		inscricaoVO.setTamanhoCamiseta(inscricao.getTamanhoCamiseta().name());
+				
+		when(eventoService.buscarPorId(evento.getId())).thenReturn(null);
+		when(inscricaoService.buscarPorId(inscricao.getId())).thenReturn(inscricao);
 		this.mockMvc
-			.perform(put(BASE_URL+"/{idEvento}",evento.getId())
+			.perform(put(BASE_URL+"/{idInscricao}", evento.getId(), inscricao.getId())
 					.contentType(KGlobal.APPLICATION_JSON_UTF8)
-					.content(TestHelper.convertObjectToJsonBytes(eventoVO))	
+					.content(TestHelper.convertObjectToJsonString(inscricaoVO))	
 					)
 				.andExpect(status().isNotFound());
+		verify(inscricaoService, never()).salvar(any());
+	}
+	
+	/**
+	 * atualizar: verifica se lança erro ao atualizar inscricao inexistente
+	 */	
+	@Test
+	public void testAtualizarInscricaoInexistente() throws Exception{
+		Evento evento = new EventoDummy();
+		Inscricao inscricao = new InscricaoDummy(evento);
+		//vo para post
+		InscricaoVOPost inscricaoVO = new InscricaoVOPost();
+		inscricaoVO.setCpf(inscricao.getCpf());
+		inscricaoVO.setNome(inscricao.getNome());
+		inscricaoVO.setEmail(inscricao.getEmail());
+		inscricaoVO.setTamanhoCamiseta(inscricao.getTamanhoCamiseta().name());
+				
+		when(eventoService.buscarPorId(evento.getId())).thenReturn(evento);
+		when(inscricaoService.buscarPorId(inscricao.getId())).thenReturn(null);
+		this.mockMvc
+			.perform(put(BASE_URL+"/{idInscricao}", evento.getId(), inscricao.getId())
+					.contentType(KGlobal.APPLICATION_JSON_UTF8)
+					.content(TestHelper.convertObjectToJsonString(inscricaoVO))	
+					)
+				.andExpect(status().isNotFound());
+		verify(inscricaoService, never()).salvar(any());
 	}
 	
 	/**
@@ -283,19 +365,93 @@ public class InscricaoControllerTest {
 	 */	
 	@Test
 	public void testAtualizarCamposInvalidos() throws Exception{
-		Long idEvento = 1L;
-		//vo para put sem campos requeridos
-		EventoVOPut eventoVO = new EventoVOPut();
-		eventoVO.setTitulo("Apenas o título");			
-		
+		Evento evento = new EventoDummy();
+		Inscricao inscricao = new InscricaoDummy(evento);
+		//vo para post
+		InscricaoVOPost inscricaoVO = new InscricaoVOPost();
+		inscricaoVO.setCpf(null);
+		inscricaoVO.setNome(inscricao.getNome());
+		inscricaoVO.setEmail(inscricao.getEmail());
+		inscricaoVO.setTamanhoCamiseta(inscricao.getTamanhoCamiseta().name());
+				
+		when(eventoService.buscarPorId(evento.getId())).thenReturn(evento);
+		when(inscricaoService.buscarPorId(inscricao.getId())).thenReturn(inscricao);
 		this.mockMvc
-			.perform(put(BASE_URL+"/{idEvento}",idEvento)
+			.perform(put(BASE_URL+"/{idInscricao}", evento.getId(), inscricao.getId())
 					.contentType(KGlobal.APPLICATION_JSON_UTF8)
-					.content(TestHelper.convertObjectToJsonBytes(eventoVO))	
+					.content(TestHelper.convertObjectToJsonString(inscricaoVO))	
 					)
 				.andExpect(status().isUnprocessableEntity())
 				.andExpect(jsonPath("$.code", equalTo(InvalidEntityException.class.getSimpleName())));
+		verify(inscricaoService, never()).salvar(any());
 		
 	}
 	
+	
+	/**
+	 * excluir: verifica se exclui corretamente
+	 */	
+	@Test
+	public void testExcluir() throws Exception{
+		Evento evento = new EventoDummy();
+		Inscricao inscricao = new InscricaoDummy(evento);
+				
+		when(eventoService.buscarPorId(evento.getId())).thenReturn(evento);
+		when(inscricaoService.buscarPorId(inscricao.getId())).thenReturn(inscricao);
+		this.mockMvc
+			.perform(delete(BASE_URL+"/{idInscricao}", evento.getId(), inscricao.getId()))
+				.andExpect(status().isOk());
+		verify(inscricaoService, atLeastOnce()).excluir(inscricao.getId());
+	}
+	
+	/**
+	 * excluir: verifica se lança erro ao excluir inscricao de outro evento
+	 */	
+	@Test
+	public void testExcluirErroVinculo() throws Exception{
+		Evento evento = new EventoDummy();
+		Inscricao inscricao = new InscricaoDummy(evento);
+		Evento outroEvento = new EventoDummy();
+		outroEvento.setId(2L);
+				
+		when(eventoService.buscarPorId(outroEvento.getId())).thenReturn(outroEvento);
+		when(inscricaoService.buscarPorId(inscricao.getId())).thenReturn(inscricao);
+		this.mockMvc
+			.perform(delete(BASE_URL+"/{idInscricao}", outroEvento.getId(), inscricao.getId()))
+				.andExpect(status().isBadRequest());
+		
+		verify(inscricaoService, never()).excluir(inscricao.getId());
+	}
+	
+	/**
+	 * excluir: verifica se lança erro ao excluir evento inexistente
+	 */	
+	@Test
+	public void testExcluirEventoInexistente() throws Exception{
+		Evento evento = new EventoDummy();
+		Inscricao inscricao = new InscricaoDummy(evento);
+				
+		when(eventoService.buscarPorId(evento.getId())).thenReturn(null);
+		when(inscricaoService.buscarPorId(inscricao.getId())).thenReturn(inscricao);
+		this.mockMvc
+			.perform(delete(BASE_URL+"/{idInscricao}", evento.getId(), inscricao.getId()))
+				.andExpect(status().isNotFound());
+		verify(inscricaoService, never()).excluir(inscricao.getId());
+	}
+	
+	/**
+	 * atualizar: verifica se lança erro ao atualizar inscricao inexistente
+	 */	
+	@Test
+	public void testExcluirInscricaoInexistente() throws Exception{
+		Evento evento = new EventoDummy();
+		Inscricao inscricao = new InscricaoDummy(evento);
+				
+		when(eventoService.buscarPorId(evento.getId())).thenReturn(evento);
+		when(inscricaoService.buscarPorId(inscricao.getId())).thenReturn(null);
+		this.mockMvc
+			.perform(delete(BASE_URL+"/{idInscricao}", evento.getId(), inscricao.getId()))
+				.andExpect(status().isNotFound());
+		verify(inscricaoService, never()).excluir(inscricao.getId());
+	}
 }

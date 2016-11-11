@@ -20,6 +20,7 @@ import br.unesp.exemplo.api.valueobjects.InscricaoVOPut;
 import br.unesp.exemplo.entities.Evento;
 import br.unesp.exemplo.entities.Inscricao;
 import br.unesp.exemplo.entities.enums.TamanhoCamiseta;
+import br.unesp.exemplo.exceptions.InvalidAssociationException;
 import br.unesp.exemplo.exceptions.InvalidEntityException;
 import br.unesp.exemplo.exceptions.NotFoundException;
 import br.unesp.exemplo.exceptions.ServiceValidationException;
@@ -76,6 +77,9 @@ public class InscricaoController {
 		if(inscricao == null){
 			throw new NotFoundException(Inscricao.class,idInscricao);
 		}
+		if(!evento.equals(inscricao.getEvento())){
+			throw new InvalidAssociationException(inscricao,evento);
+		}
 		InscricaoVO vo = EntityConverter.converterParaVO(inscricao);
 		return vo;
 	}
@@ -113,6 +117,9 @@ public class InscricaoController {
 		if(inscricao == null){
 			throw new NotFoundException(Inscricao.class,idInscricao);
 		}
+		if(!evento.equals(inscricao.getEvento())){
+			throw new InvalidAssociationException(inscricao,evento);
+		}
 		inscricao.setCpf(inscricaoVO.getCpf());
 		inscricao.setNome(inscricaoVO.getNome());
 		inscricao.setEmail(inscricaoVO.getEmail());
@@ -122,13 +129,20 @@ public class InscricaoController {
 	}
 	
 	//@Secured({ROLE_ADMINISTRADOR})
-	@RequestMapping(value = "/{idEvento}", method = RequestMethod.DELETE)
-	public void excluir(@PathVariable Long idEvento) throws NotFoundException{
+	@RequestMapping(value = "/{idInscricao}", method = RequestMethod.DELETE)
+	public void excluir(@PathVariable Long idEvento, @PathVariable Long idInscricao) throws NotFoundException{
 		Evento evento = eventoService.buscarPorId(idEvento);
 		if(evento == null){
 			throw new NotFoundException(Evento.class,idEvento);
 		}
-		eventoService.excluir(idEvento);
+		Inscricao inscricao = inscricaoService.buscarPorId(idInscricao);
+		if(inscricao == null){
+			throw new NotFoundException(Inscricao.class,idInscricao);
+		}
+		if(!evento.equals(inscricao.getEvento())){
+			throw new InvalidAssociationException(inscricao,evento);
+		}
+		inscricaoService.excluir(idInscricao);
 	}
 	
 

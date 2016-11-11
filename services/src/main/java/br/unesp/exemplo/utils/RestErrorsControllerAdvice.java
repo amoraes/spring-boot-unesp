@@ -54,7 +54,7 @@ public class RestErrorsControllerAdvice extends ResponseEntityExceptionHandler
 		log.debug("Handling "+ex.getClass().getSimpleName()+":"+ex.getMessage());
 		ErrorResource error = new ErrorResource();
         error.setCode(ex.getClass().getSimpleName());
-        error.setMessage("Parâmetro inválido");
+        error.setMessage((ex.getMessage() != null && !ex.getMessage().equals(""))?ex.getMessage():"Parâmetro(s) inválido(s)");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(KGlobal.APPLICATION_JSON_UTF8);
         return ResponseEntity.badRequest().headers(headers).body(error);

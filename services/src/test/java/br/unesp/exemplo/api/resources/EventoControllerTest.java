@@ -3,8 +3,10 @@ package br.unesp.exemplo.api.resources;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -133,7 +135,7 @@ public class EventoControllerTest {
 		this.mockMvc
 			.perform(post(BASE_URL)
 					.contentType(KGlobal.APPLICATION_JSON_UTF8)
-					.content(TestHelper.convertObjectToJsonBytes(eventoVO))	
+					.content(TestHelper.convertObjectToJsonString(eventoVO))	
 					)
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.idEvento", equalTo(evento.getId().intValue())))
@@ -160,11 +162,11 @@ public class EventoControllerTest {
 		this.mockMvc
 			.perform(post(BASE_URL)
 					.contentType(KGlobal.APPLICATION_JSON_UTF8)
-					.content(TestHelper.convertObjectToJsonBytes(eventoVO))	
+					.content(TestHelper.convertObjectToJsonString(eventoVO))	
 					)
 				.andExpect(status().isUnprocessableEntity())
 				.andExpect(jsonPath("$.code", equalTo(InvalidEntityException.class.getSimpleName())));
-		
+		verify(eventoService, never()).salvar(any());
 	}
 	
 	/**
@@ -190,7 +192,7 @@ public class EventoControllerTest {
 		this.mockMvc
 			.perform(put(BASE_URL+"/{idEvento}",evento.getId())
 					.contentType(KGlobal.APPLICATION_JSON_UTF8)
-					.content(TestHelper.convertObjectToJsonBytes(eventoVO))	
+					.content(TestHelper.convertObjectToJsonString(eventoVO))	
 					)
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.idEvento", equalTo(new Long(evento.getId()).intValue())))
@@ -224,9 +226,10 @@ public class EventoControllerTest {
 		this.mockMvc
 			.perform(put(BASE_URL+"/{idEvento}",evento.getId())
 					.contentType(KGlobal.APPLICATION_JSON_UTF8)
-					.content(TestHelper.convertObjectToJsonBytes(eventoVO))	
+					.content(TestHelper.convertObjectToJsonString(eventoVO))	
 					)
 				.andExpect(status().isNotFound());
+		verify(eventoService, never()).salvar(any());
 	}
 	
 	/**
@@ -242,11 +245,42 @@ public class EventoControllerTest {
 		this.mockMvc
 			.perform(put(BASE_URL+"/{idEvento}",idEvento)
 					.contentType(KGlobal.APPLICATION_JSON_UTF8)
-					.content(TestHelper.convertObjectToJsonBytes(eventoVO))	
+					.content(TestHelper.convertObjectToJsonString(eventoVO))	
 					)
 				.andExpect(status().isUnprocessableEntity())
 				.andExpect(jsonPath("$.code", equalTo(InvalidEntityException.class.getSimpleName())));
+		verify(eventoService, never()).salvar(any());
 		
+	}
+	
+	
+	/**
+	 * excluir: verifica se remove corretamente
+	 */	
+	@Test
+	public void testExcluir() throws Exception{
+		//entity para retorno do service
+		Evento evento = new EventoDummy();
+				
+		when(eventoService.buscarPorId(evento.getId())).thenReturn(evento);
+		this.mockMvc
+			.perform(delete(BASE_URL+"/{idEvento}",evento.getId()))
+				.andExpect(status().isOk());
+		verify(eventoService, atLeastOnce()).excluir(evento.getId());
+	}
+	
+	/**
+	 * excluir: verifica se lança erro ao excluir evento inexistente
+	 */	
+	@Test
+	public void testExcluirEventoInexistente() throws Exception{
+		//entity para retorno do service
+		Evento evento = new EventoDummy();
+		when(eventoService.buscarPorId(evento.getId())).thenReturn(null); //null <-- o service não encontrou o evento no banco de dados
+		this.mockMvc
+			.perform(delete(BASE_URL+"/{idEvento}",evento.getId()))
+				.andExpect(status().isNotFound());
+		verify(eventoService, never()).excluir(evento.getId());
 	}
 	
 }
