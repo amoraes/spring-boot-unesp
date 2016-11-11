@@ -10,12 +10,13 @@ public class InscricaoDummy extends Inscricao {
 	
 	private static final long serialVersionUID = -5586453492942822072L;
 
-	public InscricaoDummy() {
+	public InscricaoDummy(Evento evento) {
 		super.setId(1L);
 		super.setCpf("42563741327");
 		super.setNome("Alessandro Moraes");
 		super.setEmail("alessandro.moraes@unesp.br");
 		super.setTamanhoCamiseta(TamanhoCamiseta.M);
+		super.setEvento(evento);
 	}
 
 }

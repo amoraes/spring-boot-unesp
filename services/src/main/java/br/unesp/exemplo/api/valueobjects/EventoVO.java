@@ -34,15 +34,15 @@ public class EventoVO implements Serializable {
     private String email;
     
     @NotNull
-    @JsonFormat(pattern = KGlobal.DATE_FORMAT)
+    @JsonFormat(pattern = KGlobal.DATE_FORMAT, timezone = KGlobal.TIMEZONE)
     private Date inicio;
     
     @NotNull
-    @JsonFormat(pattern = KGlobal.DATE_FORMAT)
+    @JsonFormat(pattern = KGlobal.DATE_FORMAT, timezone = KGlobal.TIMEZONE)
     private Date termino;
     
     @NotNull
-    @JsonFormat(pattern = KGlobal.DATE_FORMAT)
+    @JsonFormat(pattern = KGlobal.DATE_FORMAT, timezone = KGlobal.TIMEZONE)
     private Date inicioInscricao;
     
     @NotNull

@@ -81,15 +81,20 @@ public class InscricaoController {
 	}
 		
 	@RequestMapping(method = RequestMethod.POST)
-	public InscricaoVO inserir(@RequestBody @Valid InscricaoVOPost inscricaoVO, BindingResult bindingResult) throws NotFoundException, ServiceValidationException{
+	public InscricaoVO inserir(@PathVariable Long idEvento, @RequestBody @Valid InscricaoVOPost inscricaoVO, BindingResult bindingResult) throws NotFoundException, ServiceValidationException{
 		if(bindingResult.hasErrors()){
 			throw new InvalidEntityException(InscricaoVOPost.class, bindingResult);
+		}
+		Evento evento = eventoService.buscarPorId(idEvento);
+		if(evento == null){
+			throw new NotFoundException(Evento.class,idEvento);
 		}
 		Inscricao inscricao = new Inscricao();
 		inscricao.setCpf(inscricaoVO.getCpf());
 		inscricao.setNome(inscricaoVO.getNome());
 		inscricao.setEmail(inscricaoVO.getEmail());
 		inscricao.setTamanhoCamiseta(TamanhoCamiseta.valueOf(inscricaoVO.getTamanhoCamiseta()));
+		inscricao.setEvento(evento);
 		
 		return EntityConverter.converterParaVO(inscricaoService.salvar(inscricao));
 	}

@@ -1,7 +1,9 @@
 package br.unesp.exemplo.api.resources;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,28 +23,34 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 
 import br.unesp.exemplo.KGlobal;
 import br.unesp.exemplo.api.valueobjects.EventoVOPost;
 import br.unesp.exemplo.api.valueobjects.EventoVOPut;
+import br.unesp.exemplo.api.valueobjects.InscricaoVOPost;
 import br.unesp.exemplo.entities.Evento;
 import br.unesp.exemplo.entities.EventoDummy;
+import br.unesp.exemplo.entities.Inscricao;
+import br.unesp.exemplo.entities.InscricaoDummy;
+import br.unesp.exemplo.entities.enums.TamanhoCamiseta;
 import br.unesp.exemplo.exceptions.InvalidEntityException;
 import br.unesp.exemplo.services.EventoService;
+import br.unesp.exemplo.services.InscricaoService;
 import br.unesp.exemplo.utils.RestErrorsControllerAdvice;
 import br.unesp.exemplo.utils.TestHelper;
 
-public class EventoControllerTest {
+public class InscricaoControllerTest {
 	
 	private MockMvc mockMvc;
 	
-	private final String BASE_URL = "/eventos";
+	private final String BASE_URL = "/eventos/{idEvento}/inscricoes";
 	
 	@Mock
 	private EventoService eventoService;
+	
+	@Mock
+	private InscricaoService inscricaoService;
 	
 	@InjectMocks
 	private EventoController eventoController;
@@ -61,22 +70,53 @@ public class EventoControllerTest {
 	@Test
 	public void testListar() throws Exception{
 		Evento evento = new EventoDummy();
-		List<Evento> list = Arrays.asList(new Evento[]{evento});
+		Inscricao inscricao1 = new InscricaoDummy(evento);
+		Inscricao inscricao2 = new Inscricao();
+		inscricao2.setId(2L);
+		inscricao2.setCpf("81439929343");
+		inscricao2.setNome("Juliana Ferrarezi");
+		inscricao2.setEmail("ju@unesp.br");
+		inscricao2.setTamanhoCamiseta(TamanhoCamiseta.P);
+		inscricao2.setEvento(evento);
 		
-		when(eventoService.listar()).thenReturn(list);
+		List<Inscricao> list = Arrays.asList(new Inscricao[]{ inscricao1, inscricao2 });
+		
+		when(eventoService.buscarPorId(evento.getId())).thenReturn(evento);
+		when(inscricaoService.listarPorEvento(evento)).thenReturn(list);
 		
 		this.mockMvc
 			.perform(get(BASE_URL+"/",evento.getId())
 				.accept(KGlobal.APPLICATION_JSON_UTF8))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$[0].idEvento", equalTo(new Long(evento.getId()).intValue())))
-				.andExpect(jsonPath("$[0].titulo", equalTo(evento.getTitulo())))
-				.andExpect(jsonPath("$[0].local", equalTo(evento.getLocal())))
-				.andExpect(jsonPath("$[0].email", equalTo(evento.getEmail())))
-				.andExpect(jsonPath("$[0].inicio", equalTo(KGlobal.DATE_FORMATTER.format(evento.getInicio()))))
-				.andExpect(jsonPath("$[0].termino", equalTo(KGlobal.DATE_FORMATTER.format(evento.getTermino()))))
-				.andExpect(jsonPath("$[0].inicioInscricao", equalTo(KGlobal.DATE_FORMATTER.format(evento.getInicioInscricao()))))
-				.andExpect(jsonPath("$[0].terminoInscricao", equalTo(KGlobal.DATE_FORMATTER.format(evento.getTerminoInscricao()))));
+				.andExpect(jsonPath("$[0].idInscricao", equalTo(new Long(inscricao1.getId()).intValue())))
+				.andExpect(jsonPath("$[0].idEvento", equalTo(new Long(inscricao1.getEvento().getId()).intValue())))
+				.andExpect(jsonPath("$[0].cpf", equalTo(inscricao1.getCpf())))
+				.andExpect(jsonPath("$[0].nome", equalTo(inscricao1.getNome())))
+				.andExpect(jsonPath("$[0].email", equalTo(inscricao1.getEmail())))
+				.andExpect(jsonPath("$[0].tamanhoCamiseta", equalTo(inscricao1.getTamanhoCamiseta().name())))
+				.andExpect(jsonPath("$[0].tamanhoCamisetaDescricao", equalTo(inscricao1.getTamanhoCamiseta().getDescricao())))
+				.andExpect(jsonPath("$[1].idInscricao", equalTo(new Long(inscricao2.getId()).intValue())))
+				.andExpect(jsonPath("$[1].idEvento", equalTo(new Long(inscricao2.getEvento().getId()).intValue())))
+				.andExpect(jsonPath("$[1].cpf", equalTo(inscricao2.getCpf())))
+				.andExpect(jsonPath("$[1].nome", equalTo(inscricao2.getNome())))
+				.andExpect(jsonPath("$[1].email", equalTo(inscricao2.getEmail())))
+				.andExpect(jsonPath("$[1].tamanhoCamiseta", equalTo(inscricao2.getTamanhoCamiseta().name())))
+				.andExpect(jsonPath("$[1].tamanhoCamisetaDescricao", equalTo(inscricao2.getTamanhoCamiseta().getDescricao())));
+	}
+	
+	/**
+	 * listar: verifica se retorna erro para evento inexistente
+	 */
+	@Test
+	public void testListarEventoInexistente() throws Exception{
+		Evento evento = new EventoDummy();
+
+		when(eventoService.buscarPorId(evento.getId())).thenReturn(null); //null <-- o service não encontrou o evento no banco de dados
+		
+		this.mockMvc
+			.perform(get(BASE_URL+"/",evento.getId())
+				.accept(KGlobal.APPLICATION_JSON_UTF8))
+				.andExpect(status().isNotFound());
 	}
 	
 	/**
@@ -85,29 +125,48 @@ public class EventoControllerTest {
 	@Test
 	public void testBuscarPorId() throws Exception{
 		Evento evento = new EventoDummy();
+		Inscricao inscricao = new InscricaoDummy(evento);
+		
 		when(eventoService.buscarPorId(evento.getId())).thenReturn(evento);
+		when(inscricaoService.buscarPorId(inscricao.getId())).thenReturn(inscricao);
+		
 		this.mockMvc
-			.perform(get(BASE_URL+"/{idEvento}",evento.getId())
+			.perform(get(BASE_URL+"/{idInscricao}",evento.getId(),inscricao.getId())
 				.accept(KGlobal.APPLICATION_JSON_UTF8))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.idEvento", equalTo(new Long(evento.getId()).intValue())))
-				.andExpect(jsonPath("$.titulo", equalTo(evento.getTitulo())))
-				.andExpect(jsonPath("$.local", equalTo(evento.getLocal())))
-				.andExpect(jsonPath("$.email", equalTo(evento.getEmail())))
-				.andExpect(jsonPath("$.inicio", equalTo(KGlobal.DATE_FORMATTER.format(evento.getInicio()))))
-				.andExpect(jsonPath("$.termino", equalTo(KGlobal.DATE_FORMATTER.format(evento.getTermino()))))
-				.andExpect(jsonPath("$.inicioInscricao", equalTo(KGlobal.DATE_FORMATTER.format(evento.getInicioInscricao()))))
-				.andExpect(jsonPath("$.terminoInscricao", equalTo(KGlobal.DATE_FORMATTER.format(evento.getTerminoInscricao()))));
+				.andExpect(jsonPath("$.idInscricao", equalTo(new Long(inscricao.getId()).intValue())))
+				.andExpect(jsonPath("$.idEvento", equalTo(new Long(inscricao.getEvento().getId()).intValue())))
+				.andExpect(jsonPath("$.cpf", equalTo(inscricao.getCpf())))
+				.andExpect(jsonPath("$.nome", equalTo(inscricao.getNome())))
+				.andExpect(jsonPath("$.email", equalTo(inscricao.getEmail())))
+				.andExpect(jsonPath("$.tamanhoCamiseta", equalTo(inscricao.getTamanhoCamiseta().name())))
+				.andExpect(jsonPath("$.tamanhoCamisetaDescricao", equalTo(inscricao.getTamanhoCamiseta().getDescricao())));
 				
 	}
+	
 	/**
-	 * buscarPorId: verifica se retorna nulo para id inexistente
+	 * buscarPorId: verifica se retorna nulo para inscrição inexistente
+	 */	
+	@Test
+	public void testBuscarPorIdEventoInexistente() throws Exception{
+		final long idEvento = 1L;
+		final long idInscricao = 1L;
+		when(eventoService.buscarPorId(idEvento)).thenReturn(null);
+		this.mockMvc.perform(get(BASE_URL+"/{idInscricao}",idEvento,idInscricao)
+			.accept(KGlobal.APPLICATION_JSON_UTF8))
+			.andExpect(status().isNotFound());
+	}
+	
+	/**
+	 * buscarPorId: verifica se retorna nulo para inscrição inexistente
 	 */	
 	@Test
 	public void testBuscarPorIdInexistente() throws Exception{
-		final long idEvento = 1L;
-		when(eventoService.buscarPorId(idEvento)).thenReturn(null);
-		this.mockMvc.perform(get(BASE_URL+"/{idEvento}",idEvento)
+		Evento evento = new EventoDummy();
+		final long idInscricao = 1L;
+		when(eventoService.buscarPorId(evento.getId())).thenReturn(evento);
+		when(inscricaoService.buscarPorId(idInscricao)).thenReturn(null);
+		this.mockMvc.perform(get(BASE_URL+"/{idInscricao}",evento.getId(),idInscricao)
 			.accept(KGlobal.APPLICATION_JSON_UTF8))
 			.andExpect(status().isNotFound());
 	}
@@ -117,33 +176,31 @@ public class EventoControllerTest {
 	 */	
 	@Test
 	public void testInserir() throws Exception{
-		//entity para retorno do service
 		Evento evento = new EventoDummy();
+		Inscricao inscricao = new InscricaoDummy(evento);
 		//vo para post
-		EventoVOPost eventoVO = new EventoVOPost();
-		eventoVO.setTitulo(evento.getTitulo());
-		eventoVO.setLocal(evento.getLocal());
-		eventoVO.setEmail(evento.getEmail());
-		eventoVO.setInicio(evento.getInicio());
-		eventoVO.setTermino(evento.getTermino());
-		eventoVO.setInicioInscricao(evento.getInicioInscricao());
-		eventoVO.setTerminoInscricao(evento.getTerminoInscricao());
+		InscricaoVOPost inscricaoVO = new InscricaoVOPost();
+		inscricaoVO.setCpf(inscricao.getCpf());
+		inscricaoVO.setNome(inscricao.getNome());
+		inscricaoVO.setEmail(inscricao.getEmail());
+		inscricaoVO.setTamanhoCamiseta(inscricao.getTamanhoCamiseta().name());
 				
-		when(eventoService.salvar(any())).thenReturn(evento);
+		when(eventoService.buscarPorId(evento.getId())).thenReturn(evento);
+		when(inscricaoService.salvar(any())).thenReturn(inscricao);
 		this.mockMvc
 			.perform(post(BASE_URL)
 					.contentType(KGlobal.APPLICATION_JSON_UTF8)
-					.content(TestHelper.convertObjectToJsonBytes(eventoVO))	
+					.content(TestHelper.convertObjectToJsonBytes(inscricaoVO))	
 					)
 				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.idInscricao", equalTo(inscricao.getId().intValue())))
 				.andExpect(jsonPath("$.idEvento", equalTo(evento.getId().intValue())))
-				.andExpect(jsonPath("$.titulo", equalTo(evento.getTitulo())))
-				.andExpect(jsonPath("$.local", equalTo(evento.getLocal())))
-				.andExpect(jsonPath("$.email", equalTo(evento.getEmail())))
-				.andExpect(jsonPath("$.inicio", equalTo(KGlobal.DATE_FORMATTER.format(evento.getInicio()))))
-				.andExpect(jsonPath("$.termino", equalTo(KGlobal.DATE_FORMATTER.format(evento.getTermino()))))
-				.andExpect(jsonPath("$.inicioInscricao", equalTo(KGlobal.DATE_FORMATTER.format(evento.getInicioInscricao()))))
-				.andExpect(jsonPath("$.terminoInscricao", equalTo(KGlobal.DATE_FORMATTER.format(evento.getTerminoInscricao()))));
+				.andExpect(jsonPath("$.cpf", equalTo(inscricao.getCpf())))
+				.andExpect(jsonPath("$.nome", equalTo(inscricao.getNome())))
+				.andExpect(jsonPath("$.email", equalTo(inscricao.getEmail())))
+				.andExpect(jsonPath("$.tamanhoCamiseta", equalTo(inscricao.getTamanhoCamiseta().name())))
+				.andExpect(jsonPath("$.tamanhoCamisetaDescricao", equalTo(inscricao.getTamanhoCamiseta().getDescricao())))
+				;
 		verify(eventoService, atLeastOnce()).salvar(any());
 	}
 	
@@ -175,11 +232,10 @@ public class EventoControllerTest {
 		//entity para retorno do service
 		Evento evento = new EventoDummy();
 		//vo para put
-		String novoEmail = "novoemaildoevento@unesp.br";
 		EventoVOPut eventoVO = new EventoVOPut();
 		eventoVO.setTitulo(evento.getTitulo());
 		eventoVO.setLocal(evento.getLocal());
-		eventoVO.setEmail(novoEmail);
+		eventoVO.setEmail(evento.getEmail());
 		eventoVO.setInicio(evento.getInicio());
 		eventoVO.setTermino(evento.getTermino());
 		eventoVO.setInicioInscricao(evento.getInicioInscricao());
@@ -193,14 +249,7 @@ public class EventoControllerTest {
 					.content(TestHelper.convertObjectToJsonBytes(eventoVO))	
 					)
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.idEvento", equalTo(new Long(evento.getId()).intValue())))
-				.andExpect(jsonPath("$.titulo", equalTo(evento.getTitulo())))
-				.andExpect(jsonPath("$.local", equalTo(evento.getLocal())))
-				.andExpect(jsonPath("$.email", equalTo(novoEmail)))
-				.andExpect(jsonPath("$.inicio", equalTo(KGlobal.DATE_FORMATTER.format(evento.getInicio()))))
-				.andExpect(jsonPath("$.termino", equalTo(KGlobal.DATE_FORMATTER.format(evento.getTermino()))))
-				.andExpect(jsonPath("$.inicioInscricao", equalTo(KGlobal.DATE_FORMATTER.format(evento.getInicioInscricao()))))
-				.andExpect(jsonPath("$.terminoInscricao", equalTo(KGlobal.DATE_FORMATTER.format(evento.getTerminoInscricao()))));
+				.andExpect(jsonPath("$.idEvento", equalTo(new Long(evento.getId()).intValue())));
 		verify(eventoService, atLeastOnce()).salvar(any());
 	}
 	

@@ -1,6 +1,8 @@
 package br.unesp.exemplo.entities;
 
+import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 /**
  * RESTful Classe que gera dados para os testes
@@ -15,10 +17,15 @@ public class EventoDummy extends Evento {
 		super.setTitulo("Evento XYZ");
 		super.setLocal("Faculdade de Engenharia de Bauru - Sala 101");
 		super.setEmail("eventoxyz@feb.unesp.br");
-		super.setInicio(new GregorianCalendar(2016, 12, 01).getTime());
-		super.setTermino(new GregorianCalendar(2016, 12, 10).getTime());
-		super.setInicioInscricao(new GregorianCalendar(2016, 11, 01).getTime());
-		super.setTerminoInscricao(new GregorianCalendar(2016, 11, 15).getTime());
+		Calendar calendar = Calendar.getInstance(Locale.getDefault());
+		calendar.set(2016, 11, 1);
+		super.setInicio(calendar.getTime());
+		calendar.set(2016, 11, 10);
+		super.setTermino(calendar.getTime());
+		calendar.set(2016, 10, 1);
+		super.setInicioInscricao(calendar.getTime());
+		calendar.set(2016, 10, 15);
+		super.setTerminoInscricao(calendar.getTime());
 	}
 
 }

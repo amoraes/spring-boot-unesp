@@ -26,6 +26,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		//permite a consulta nessas urls para qualquer um
 		web.ignoring().antMatchers("/docs/**");
 		//web.ignoring().antMatchers("/minha-url-de-consulta-publica/**");
+		web.ignoring().antMatchers("/**");
 	}
 	
 }
+
