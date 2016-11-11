@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html data-ng-app="exemplo" data-ng-strict-di data-ng-controller="MainController as MC">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+	<meta name="viewport" content="width=device-width">
+    
+    <title>Sistema Exemplo</title>
+	<script src="bower_components/angular/angular.js"></script>
+	<script src="bower_components/angular-resource/angular-resource.js"></script>
+	<script src="bower_components/angular-animate/angular-animate.js"></script>
+	<script src="bower_components/angular-aria/angular-aria.js"></script>
+	<script src="bower_components/angular-messages/angular-messages.js"></script>
+	<script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+	<script src="bower_components/angular-route/angular-route.js"></script>
+	<script src="bower_components/angular-material/angular-material.js"></script>  
+
+	<link rel="stylesheet" href="bower_components/angular-material/angular-material.min.css" type="text/css">
+    <link rel="stylesheet" href="css/material-icons/material-icons.css" type="text/css">
+    <link rel="stylesheet" href="css/custom.css" rel="stylesheet" type="text/css">
+	
+    
+    <script src="js/app.js"></script>
+    <script src="js/directives.js"></script>
+    <!-- Controllers -->
+    <script src="js/controllers/MainController.js"></script>
+    <!-- Services -->
+    <script src="js/services/Utils.js"></script>
+    <script src="js/services/SessionService.js"></script>
+    
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' type='text/css'>
+  </head>
+  <body layout="column" flex ng-cloak>
+	<md-toolbar layout="row" class="md-whiteframe-z1">
+		<div class="md-toolbar-tools">
+	    	<md-button class="md-icon-button" ng-click="MC.toggleMenu()" hide-gt-md  aria-label="Abrir/Fechar Menu">
+          		<md-icon md-svg-src="img/ic_menu.svg"></md-icon>
+        	</md-button>
+	        <h1>
+	          <span>Sistema Exemplo</span>
+	        </h1>
+	        <span flex></span>
+	        <span data-ng-hide="!authenticated">
+	        	<h5>
+	        		<span ng-show="mdMedia('gt-md')" id="text_username">{{MC.getUser().name}}</span>
+	        		<md-button data-ng-click="MC.logout()" class="md-icon-button" aria-label="Sair" id="button_logout">
+		          		<md-icon class="material-icons" >cancel</md-icon>
+		        	</md-button>
+	        	</h5>
+	        </span>
+		</div>
+	</md-toolbar>
+	<div class="loadingContainer" ng-hide="MC.ready">
+   		<md-progress-linear md-mode="query"></md-progress-linear>
+   		<div class="bottom-block">
+      		<span>Carregando, por favor aguarde...</span>
+    	</div>
+    </div>
+	  	
+	</div>
+    <div layout="row" flex ng-show="MC.ready">
+        <md-sidenav layout="column" class="md-sidenav-left md-whiteframe-z3" md-component-id="leftMenu" md-is-locked-open="$mdMedia('gt-md')" md-disable-backdrop>
+            <md-content layout="column" flex>
+            	<div ng-hide="mdMedia('gt-md') || MC.getUser() == null">
+            	 	<md-subheader class="md-no-sticky">
+            	 	Usuário
+            	 	<p id="text_username_mobile"><b>{{MC.getUser().name}}</b>
+            	 	</p>
+            	 	</md-subheader>
+            		<md-divider ></md-divider>
+            	</div>
+            	<md-menu-content flex layout="column">
+              		<md-menu-item data-ng-repeat="item in MC.menuItems">
+                		<md-button ng-click="MC.openUrl(item.url)">
+                			<md-icon class="material-icons">{{ item.icon }}</md-icon>
+	                  		{{ item.label }}
+	                	</md-button>
+              		</md-menu-item>
+              		<!-- menu admin -->
+              		<md-divider ng-hide="MC.menuAdminItems.length == 0" ></md-divider>
+              		<md-menu-item ng-hide="MC.menuAdminItems.length == 0">
+                		<md-button ng-click="MC.toggleSubMenu('admin')">
+	                  		<div layout="row" flex>
+                    			<p flex><b>Administrador</b></p>
+                    			<md-icon md-menu-align-target style="margin: auto 3px auto 0;" class="material-icons">
+                    			{{ MC.menuAdminVisible ? 'expand_less' : 'expand_more' }}
+                    			</md-icon>
+                  			</div>
+	                	</md-button>
+              		</md-menu-item>
+              		<md-menu-item data-ng-repeat="item in MC.menuAdminItems" ng-show="MC.menuAdminVisible">
+                		<md-button ng-click="MC.openUrl(item.url)">
+                			<md-icon class="material-icons">{{ item.icon }}</md-icon>
+	                  		{{ item.label }}
+	                	</md-button>
+              		</md-menu-item>
+              		<md-divider ></md-divider>
+              	</md-menu-content>
+            </md-content>
+        </md-sidenav>
+        <div layout="column" flex id="content" ng-view>
+            
+        </div>
+    </div>
+</body>
+
+</html>

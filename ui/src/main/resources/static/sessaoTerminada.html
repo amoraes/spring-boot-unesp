@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html data-ng-app="sessaoTerminada" data-ng-controller="Ctrl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+	<meta name="viewport" content="width=device-width">
+    
+    <title>Central de Acessos</title>
+	<script src="bower_components/angular/angular.js"></script>
+	<script src="bower_components/angular-resource/angular-resource.js"></script>
+	<script src="bower_components/angular-animate/angular-animate.js"></script>
+	<script src="bower_components/angular-aria/angular-aria.js"></script>
+	<script src="bower_components/angular-messages/angular-messages.js"></script>
+	<script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+	<script src="bower_components/angular-route/angular-route.js"></script>
+	<script src="bower_components/angular-material/angular-material.js"></script>  
+
+	<link rel="stylesheet" href="bower_components/angular-material/angular-material.min.css" type="text/css">
+    <link rel="stylesheet" href="css/material-icons/material-icons.css" type="text/css">
+    <link rel="stylesheet" href="css/custom.css" rel="stylesheet" type="text/css">
+	
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' type='text/css'>
+    
+    <script>
+    angular.module('sessaoTerminada', ['ngMaterial'])
+    .config(function($mdThemingProvider){
+		$mdThemingProvider.theme('default')
+	    .primaryPalette('blue')
+	    .accentPalette('light-blue');
+	})
+    .controller('Ctrl', function($scope) {
+      
+    });
+    </script>
+  </head>
+  <body layout="column" flex ng-cloak>
+	<md-toolbar layout="row" class="md-whiteframe-z1">
+		<div class="md-toolbar-tools">
+	        <h1>
+	          <span>Sistemas Unesp</span>
+	        </h1>
+		</div>
+	</md-toolbar>
+    <div layout="row" flex>
+        <md-content md-dynamic-height layout-margin flex>
+			<md-card>
+				<md-card-header>
+		          <md-card-avatar>
+		            <md-icon class="material-icons icon-red600-bg">lock</md-icon>
+		          </md-card-avatar>
+		          <md-card-header-text>
+		            <span class="md-title">Ops!</span>
+		            <span class="md-subhead">Acesso Negado</span>
+		          </md-card-header-text>
+		        </md-card-header>
+		
+		        <md-card-content>
+		          <p>
+		            Esse usuário não está mais autenticado no sistema.
+		          </p>
+		          <md-button class="md-raised md-primary" href="/central/login">OK</md-button>
+		        </md-card-content>
+		      </md-card>
+		</md-content>
+    </div>
+</body>
+
+</html>
+
+

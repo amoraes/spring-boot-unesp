@@ -1,0 +1,76 @@
+* {
+	font-family: 'Roboto', sans-serif;
+}
+.hint {
+	font-size: 12px;
+    line-height: 22px;
+    color: grey;
+}
+.error {
+	color: #E53935;
+}
+.success {
+	color: #43A047;
+}
+
+
+.material-icons.orange600 { color: #FB8C00; }
+.material-icons.red600 { color: #E53935; }
+.material-icons.green600 { color: #43A047; }
+.material-icons.yellow600 { color: #FDD835; }
+.material-icons.grey600 { color: #757575; }
+
+.pointer {
+    cursor: pointer;
+}
+
+.simple-button {
+	text-align: left;
+    text-transform: none;
+}
+
+@media (min-width: 960px){
+	#error-toast {
+	    top: 70px;
+	    right: 25px;
+	}
+}
+
+md-menu-content {
+	max-height: 1280px;
+}
+
+.icon-red600-bg {
+	background-color: #E53935;
+}
+
+.floating-button{
+	position: absolute;
+	bottom: 20px;
+	right: 20px;
+}
+
+.center-vertical-image {
+	vertical-align:middle;
+	padding-bottom: 5px;
+}
+
+.bold {
+	font-weight: bold;
+}
+
+-- bloco de carregando inicial
+.loadingContainer { 
+  transition: opacity  0.1s linear;
+  border-top: 0px; }
+.loadingContainer .bottom-block {
+  display: block;
+  position: relative;
+  background-color: rgba(255, 235, 169, 0.25);
+  height: 85px;
+  width: 100%; }
+.loadingContainer .bottom-block > span {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 25px;
+  font-size: 0.9em; }
