@@ -14,7 +14,9 @@ app.factory('EventoResource', ['$resource', '$log', function($resource, $log){
 				list: {
 					method: 'GET',
 					isArray: true
-				}				
+				}	
+				//métodos get(id), save e delete não necessitam de configuração adicional
+				//mas estão disponíveis
 			}
 	);
 }]);

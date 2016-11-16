@@ -1,23 +1,26 @@
+//Módulo AngularJS - Raiz da Aplicação
 angular.module('exemplo', ['ngMaterial', 'ngMessages', 'ngRoute', 'ngResource'])
+//Constantes a serem importadas em outros Services ou Controllers
 .constant("CONFIG", {
     "ROLE_ADMIN": "ROLE_UNESP.EXEMPLO_ADMINISTRADOR",
     "CONTEXT_PATH": "exemplo"
 })
+//Inicialização do App
 .run(['$rootScope', '$log', 'SessionService', function($rootScope, $log, SessionService){
 	$log.debug('Inicializando Angular App Exemplo');
 	$rootScope.authenticated = false;
 }])
+//Configurações visuais do Angular-Material
 .config(['$mdThemingProvider', function($mdThemingProvider){
 	$mdThemingProvider.theme('default')
     .primaryPalette('blue')
     .accentPalette('light-blue');
 }])
-
+//Interceptor para redirecionar para tela de login quando expirou o Token de acesso
 .factory('RedirectInterceptor', ['$q', '$location' ,'$window' ,'$log' ,'CONFIG', function($q,$location,$window,$log,CONFIG){
     return  {
         'response':function(response){     
 	        if (typeof response.data === 'string' && response.data.indexOf('UNESPAUTH_LOGIN_PAGE') != -1 
-	        		&& !$location.$$path.startsWith('/public/') && !$location.$$path == ''
 	        ) {     	
 	        	window.location = 'login';
 	        }else{
@@ -26,9 +29,11 @@ angular.module('exemplo', ['ngMaterial', 'ngMessages', 'ngRoute', 'ngResource'])
         }
     }
 }])
+//Registrando o interceptor
 .config(['$httpProvider', function($httpProvider) {
 	$httpProvider.interceptors.push('RedirectInterceptor');
 }])
+//Configurações de localização de data para dd/MM/yyyy e português
 .config(['$mdDateLocaleProvider',function($mdDateLocaleProvider) {
   var regex=new RegExp("(([0-2]{1}[0-9]{1}|3[0-1]{1})[/](0[1-9]|1[0-2])[/][0-9]{4})");
   $mdDateLocaleProvider.formatDate = function(date) {
@@ -53,6 +58,7 @@ angular.module('exemplo', ['ngMaterial', 'ngMessages', 'ngRoute', 'ngResource'])
   $mdDateLocaleProvider.days = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
   $mdDateLocaleProvider.shortDays = ['D','S','T','Q','Q','S','S'];
 }])
+//rotas da aplicação -> Mapeamento URL x View + Controller
 .config(['$routeProvider', function($routeProvider) {
 	$routeProvider
 	.when('/', {
@@ -71,6 +77,7 @@ angular.module('exemplo', ['ngMaterial', 'ngMessages', 'ngRoute', 'ngResource'])
         templateUrl: 'views/eventosEditar.html',
         controller: 'EventosEditarController as Ctrl'
     })
+    //Rota padrão
 	.otherwise({
 		redirectTo: '/'
     });

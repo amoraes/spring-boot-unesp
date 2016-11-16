@@ -1,4 +1,6 @@
+//Algumas diretivas úteis
 var app = angular.module('exemplo');
+//comparação de um campo à outro
 app.directive("compareTo", function() {
     return {
         require: "ngModel",
@@ -14,6 +16,7 @@ app.directive("compareTo", function() {
         }
     };
 })
+//clique com o botão direito e toque demorado na tela em dispositivos móveis usado para ativar menus de contexto
 .directive('onLongPress', ['$parse', '$timeout', '$log' , function ($parse, $timeout, $log) {
     return {
         restrict: 'A',
