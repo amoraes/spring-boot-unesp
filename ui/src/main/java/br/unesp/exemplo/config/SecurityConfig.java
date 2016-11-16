@@ -43,6 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests().antMatchers("/views/**").permitAll();
 		http.authorizeRequests().antMatchers("/services-public/**").permitAll();
 		http.authorizeRequests().antMatchers("/sessaoTerminada.html").permitAll();
+		http.authorizeRequests().antMatchers("/public/**").permitAll();
 		http.authorizeRequests().antMatchers("/index.html", "/")
         .permitAll().anyRequest().authenticated()
         .and().csrf().csrfTokenRepository(CsrfHeaderFilter.csrfTokenRepository())
