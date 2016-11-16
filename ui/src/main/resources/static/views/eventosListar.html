@@ -1,0 +1,47 @@
+<md-subheader class="md-primary md-whiteframe-z1">Cadastro de Eventos</md-subheader>
+<md-content md-dynamic-height layout-margin ng-show="authenticated && Ctrl.ready">
+	<md-list>
+ 	    <md-input-container class="md-block">
+		  	<label>Digite o título do evento para pesquisar</label>
+		  	<input type="search" ng-model="filtro.$" />
+		</md-input-container>
+		<div>
+		<md-menu ng-repeat="evento in Ctrl.eventos | orderBy: 'titulo' | filter:filtro " md-position-mode="target target" md-offset="200 40">
+			<md-list-item  
+			ng-click="Ctrl.editar(evento.idEvento, false)" on-long-press="Ctrl.selecionar(evento.idEvento, $event, $mdOpenMenu)"	
+			class="md-3-line" aria-label="Editar evento {{evento.titulo}}">
+				<div class="md-list-item-text" >
+					<h3>{{ evento.titulo }}</h3>
+					<p>Inscrições:</p>
+					<p>Período:</p>
+				</div>
+			</md-list-item>
+			<md-menu-content width="6">
+                  <md-menu-item ng-click="Ctrl.editar(evento.idEvento, true)">
+                     <md-button>
+                        <div layout="row">
+                           <md-icon md-menu-align-target class="material-icons">edit</md-icon>
+                           <p flex>Editar</p>
+                        </div>
+                     </md-button>
+                  </md-menu-item>
+                  <md-menu-item>
+                     <md-button ng-click="Ctrl.excluir(evento.idEvento, evento.titulo, $event)">
+                        <div layout="row">
+                           <md-icon md-menu-align-target class="material-icons">delete</md-icon>
+                           <p flex>Excluir</p>
+                        </div>
+                     </md-button>
+                  </md-menu-item>
+            </md-menu-content>
+		</md-menu>
+		</div>
+	</md-list>
+</md-content>
+<div class="floating-button" ng-show="authenticated && Ctrl.ready">
+	<md-fab-trigger class="align-with-text">
+      <md-button aria-label="inserir" class="md-fab md-primary" ng-click="Ctrl.inserir()" aria-label="Inserir evento">
+        <md-icon class="material-icons" aria-label="Inserir evento">add</md-icon>
+      </md-button>
+    </md-fab-trigger>
+</div>

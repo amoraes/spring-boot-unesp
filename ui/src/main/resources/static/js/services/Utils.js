@@ -4,8 +4,8 @@ var app = angular.module('exemplo');
  * Factory para utilitários
  */
 app.factory('Utils', 
-	['$rootScope', '$log', '$mdDialog', '$mdToast', '$mdMedia', '$location', 'SessionService', 'CONFIG',
-    function($rootScope, $log, $mdDialog, $mdToast, $mdMedia, $location, SessionService, CONFIG){
+	['$rootScope', '$log', '$mdDialog', '$mdToast', '$mdMedia', '$location', '$mdDateLocale', 'SessionService', 'CONFIG',
+    function($rootScope, $log, $mdDialog, $mdToast, $mdMedia, $location, $mdDateLocaleProvider, SessionService, CONFIG){
 		var self = this;
 		
 		/**
@@ -152,6 +152,39 @@ app.factory('Utils',
 					}
 				});
 			}
+		}
+		
+		self.datesToString = function(obj){
+			if(typeof obj !== 'object'){
+				return obj;
+			}
+			var newObj = {};
+			for(var key in obj){
+				var value = obj[key];
+				if(Object.prototype.toString.call(obj[key]) === '[object Date]'){
+					newObj[key] = $mdDateLocaleProvider.formatDate(value);
+				}else{
+					newObj[key] = value;
+				}
+			}
+			return newObj;
+		}
+		
+		self.datesToDate = function(obj){
+			var regex=new RegExp("(([0-2]{1}[0-9]{1}|3[0-1]{1})[/](0[1-9]|1[0-2])[/][0-9]{4})");
+			if(typeof obj !== 'object'){
+				return obj;
+			}
+			var newObj = {};
+			for(var key in obj){
+				var value = obj[key];
+				if(typeof value === 'string' && regex.test(value)){
+					newObj[key] = $mdDateLocaleProvider.parseDate(value);
+				}else{
+					newObj[key] = value;
+				}
+			}
+			return newObj;
 		}
 		
 		return self;

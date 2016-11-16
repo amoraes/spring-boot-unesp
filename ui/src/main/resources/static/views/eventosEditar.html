@@ -1,0 +1,58 @@
+<md-subheader class="md-primary md-whiteframe-z1">Cadastro de Eventos &rarr; Editar</md-subheader>
+<md-content md-dynamic-height layout-margin ng-show="authenticated && Ctrl.ready">
+	<form name="frm" novalidate="novalidate">
+		<md-content class="md-padding">
+	  		<md-input-container class="md-block">
+				<label>Título</label>
+	     		<input type="text" required name="titulo" ng-model="Ctrl.evento.titulo" ng-minlength="3" md-maxlength="100" />
+	     		<div ng-messages="frm.titulo.$error">
+	     			<div ng-message="required">Título é obrigatório.</div>
+	     			<div ng-message="minlength">Título deve ter no mínimo 3 caracteres.</div>
+	     			<div ng-message="maxlength">Título deve ter no máximo 100 caracteres.</div>
+			    </div>
+	   		</md-input-container>
+	   		<md-input-container class="md-block">
+				<label>Local</label>
+	     		<input type="text" required name="local" ng-model="Ctrl.evento.local" ng-minlength="5" md-maxlength="255"/>
+	     		<div ng-messages="frm.descricao.$error">
+	     			<div ng-message="required">Local é obrigatório.</div>
+	     			<div ng-message="minlength">Local deve ter no mínimo 5 caracteres.</div>
+	     			<div ng-message="maxlength">Local deve ter no máximo 255 caracteres.</div>
+			    </div>
+	   		</md-input-container>
+	   		<md-input-container class="md-block">
+				<label>E-mail</label>
+	     		<input type="email" required name="email" ng-model="Ctrl.evento.email" md-maxlength="100"/>
+	     		<div class="hint">E-mail para contato, ficará visível na página de inscrição</div>
+	     		<div ng-messages="frm.email.$error">
+	     			<div ng-message="required">E-mail é obrigatório.</div>
+	     			<div ng-message="maxlength">E-mail deve ter no máximo 100 caracteres.</div>
+	     			<div ng-message="url">E-mail não é um endereço válido.</div>
+			    </div>
+	   		</md-input-container>
+	   		<h4>Datas do Evento</h4>
+	   		<md-input-container class="md-block">
+	   		<label>Início</label>
+	   		<md-datepicker required ng-model="Ctrl.evento.inicio"></md-datepicker>
+	   		</md-input-container>
+	   		<md-input-container class="md-block">
+	   		<label>Término</label>
+	   		<md-datepicker required ng-model="Ctrl.evento.termino"></md-datepicker>
+	   		</md-input-container>
+	   		<h4>Período de Inscrições</h4>
+	   		<md-input-container class="md-block">
+	   		<label>Início</label>
+	   		<md-datepicker required ng-model="Ctrl.evento.inicioInscricao"></md-datepicker>
+	   		</md-input-container>
+	   		<md-input-container class="md-block">
+	   		<label>Término</label>
+	   		<md-datepicker required ng-model="Ctrl.evento.terminoInscricao"></md-datepicker>
+	   		</md-input-container>
+		</md-content>
+		
+		<section layout="row" layout-sm="column" layout-align="center center" layout-wrap>
+			<md-button ng-click="Ctrl.voltar()" class="md-raised">Voltar</md-button>
+		    <md-button ng-click="Ctrl.salvar()" class="md-raised md-primary" ng-disabled="!frm.$valid">Salvar</md-button>
+		</section>
+	</form>
+</md-content>

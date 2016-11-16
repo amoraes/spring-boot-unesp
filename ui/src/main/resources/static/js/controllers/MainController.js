@@ -25,8 +25,8 @@ app.controller('MainController',
 	    
 		self.loadMenu = function(){
 			 if(SessionService.hasRole(CONFIG.ROLE_ADMIN)){
-				 self.menuItems.push({"label": "Cadastro de Eventos", "icon": "settings", "url": "/admin/eventos/listar"});
-				 self.menuItems.push({"label": "Inscrições", "icon": "library_books", "url": "/admin/inscricoes/listar"});
+				 self.menuItems.push({"label": "Cadastro de Eventos", "icon": "settings", "url": "/eventos/listar"});
+				 self.menuItems.push({"label": "Inscrições", "icon": "library_books", "url": "/inscricoes/listar"});
 			 }
 			 Utils.wait(false);
 		}
