@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class LogoutController {
 	
-	@Value("${unespauth.logout-url}")
-	public String UNESPAUTH_LOGOUT_URL;
+	@Value("${unespauth.base-url}")
+	public String UNESPAUTH_BASE_URL;
 
 	@RequestMapping(value = "/logout")
 	public String logout(HttpServletRequest req, HttpServletResponse reponse){
 		req.getSession().invalidate();
 		SecurityContextHolder.getContext().setAuthentication(null);
-		return "redirect:"+UNESPAUTH_LOGOUT_URL;
+		return "redirect:"+UNESPAUTH_BASE_URL;
 	}
 	
 }
