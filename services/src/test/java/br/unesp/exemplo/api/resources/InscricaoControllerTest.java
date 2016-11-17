@@ -122,6 +122,38 @@ public class InscricaoControllerTest {
 	}
 	
 	/**
+	 * listar: verifica se contar corretamente
+	 */
+	@Test
+	public void testContar() throws Exception{
+		Long quantidade = 10L;
+		Evento evento = new EventoDummy();	
+		when(eventoService.buscarPorId(evento.getId())).thenReturn(evento);
+		when(inscricaoService.contarPorEvento(evento)).thenReturn(quantidade);
+		
+		this.mockMvc
+			.perform(get(BASE_URL+"/count",evento.getId())
+				.accept(KGlobal.APPLICATION_JSON_UTF8))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.count", equalTo(new Long(quantidade).intValue())));
+	}
+	
+	/**
+	 * listar: verifica se retorna erro para evento inexistente
+	 */
+	@Test
+	public void testContarEventoInexistente() throws Exception{
+		Evento evento = new EventoDummy();
+		when(eventoService.buscarPorId(evento.getId())).thenReturn(null); //null <-- o service não encontrou o evento no banco de dados
+		
+		this.mockMvc
+			.perform(get(BASE_URL+"/count",evento.getId())
+				.accept(KGlobal.APPLICATION_JSON_UTF8))
+				.andExpect(status().isNotFound());
+	}
+	
+	
+	/**
 	 * buscarPorId: verifica se retorna corretamente
 	 */
 	@Test

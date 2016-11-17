@@ -6,7 +6,7 @@ app.controller('EventosListarController',
 		$log.debug('Inicializando EventosListarController');
 		
 		var self = this;
-		var eventos = [];
+		self.eventos = [];
 		
 		self.ready = false;
 		self.idEventoSelecionado = null;

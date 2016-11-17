@@ -77,6 +77,10 @@ angular.module('exemplo', ['ngMaterial', 'ngMessages', 'ngRoute', 'ngResource'])
         templateUrl: 'views/eventosEditar.html',
         controller: 'EventosEditarController as Ctrl'
     })
+    .when('/inscricoes', {
+        templateUrl: 'views/inscricoes.html',
+        controller: 'InscricoesController as Ctrl'
+    })
     //Rota padrão
 	.otherwise({
 		redirectTo: '/'

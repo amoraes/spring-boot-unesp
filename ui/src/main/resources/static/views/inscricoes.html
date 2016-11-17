@@ -1,0 +1,19 @@
+<md-subheader class="md-primary md-whiteframe-z1">Inscrições</md-subheader>
+<md-content md-dynamic-height layout-margin ng-show="authenticated && Ctrl.ready">
+	<md-list>
+ 	    <md-input-container class="md-block">
+		  	<label>Digite o título do evento para pesquisar</label>
+		  	<input type="search" ng-model="filtro.$" />
+		</md-input-container>
+		<div>
+			<md-list-item  ng-repeat="evento in Ctrl.eventos | orderBy: 'titulo' | filter:filtro "
+			ng-click="Ctrl.editar(evento.idEvento, false)" on-long-press="Ctrl.selecionar(evento.idEvento, $event)"	
+			class="md-3-line" aria-label="Inscrições do evento {{evento.titulo}}">
+				<div class="md-list-item-text" >
+					<h3>{{ evento.titulo }}</h3>
+					<p>Inscritos: {{ evento.inscritos }}</p>
+				</div>
+			</md-list-item>
+		</div>
+	</md-list>
+</md-content>

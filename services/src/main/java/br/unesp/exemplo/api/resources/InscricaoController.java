@@ -1,7 +1,9 @@
 package br.unesp.exemplo.api.resources;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.mail.MessagingException;
 import javax.validation.Valid;
@@ -59,6 +61,22 @@ public class InscricaoController {
 			list.add(vo);
 		});
 		return list;
+	}
+	
+	/**
+	 * Retorna a contagem de todos as Inscrições deste evento
+	 * @return
+	 * @throws NotFoundException 
+	 */
+	@RequestMapping(value ="/count", method = RequestMethod.GET)
+	public Map<String, Long> contar(@PathVariable Long idEvento) throws NotFoundException{
+		Evento evento = eventoService.buscarPorId(idEvento);
+		if(evento == null){
+			throw new NotFoundException(Evento.class,idEvento);
+		}
+		Map<String, Long> map = new HashMap<>();
+		map.put("count", inscricaoService.contarPorEvento(evento));
+		return map;
 	}
 	
 	/**

@@ -51,4 +51,8 @@ public class InscricaoService {
 	public List<Inscricao> listarPorEvento(Evento evento) {
 		return repo.findByEvento(evento);
 	}
+
+	public Long contarPorEvento(Evento evento) {
+		return repo.countByEvento(evento);
+	}
 }

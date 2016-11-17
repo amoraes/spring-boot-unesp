@@ -20,4 +20,6 @@ public interface InscricaoRepository extends JpaRepository<Inscricao, Long> {
 	@Query("SELECT i FROM Inscricao i WHERE i.evento.id = :idEvento ORDER BY id ASC")
 	public List<Inscricao> findByIdEvento(@Param("idEvento") Long idEvento);
 	
+	public Long countByEvento(Evento evento);
+	
 }
