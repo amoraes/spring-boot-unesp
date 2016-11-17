@@ -1,0 +1,92 @@
+<md-subheader class="md-primary md-whiteframe-z1">Inscrever-se</md-subheader>
+<md-content md-dynamic-height md-border-bottom layout-margin ng-cloak>
+	<form name="form" novalidate="novalidate" >
+	<md-tabs md-dynamic-height md-border-bottom md-selected="Ctrl.abaSelecionada">
+      <md-tab label="Evento" ng-disabled="Ctrl.inscricao.idInscricao != null">
+        <md-content class="md-padding">
+          <p>Por favor, selecione o evento que deseja participar na lista abaixo:</p>
+          <md-input-container class="md-block">
+	          <label>Evento</label>
+	          <md-icon class="material-icons">insert_invitation</md-icon>
+	          <md-select ng-required="true" name="evento" ng-model="Ctrl.inscricao.idEvento">
+	            <md-option ng-repeat="evento in Ctrl.eventos" ng-value="evento.idEvento">
+	              {{evento.titulo}}
+	            </md-option>
+	          </md-select>
+	          <div ng-messages="form.evento.$error">
+	          	<div ng-message="required">Evento é obrigatório.</div>
+	          </div>
+          </md-input-container>
+          <section layout="row" layout-sm="column" layout-align="center center" layout-wrap>
+		      <md-button name="button_avancar_step1" ng-click="Ctrl.avancar1()"
+		      ng-disabled="Ctrl.inscricao.idEvento == null" 
+		       class="md-raised md-primary">Avançar &rArr;</md-button>
+	      </section>
+        </md-content>
+      </md-tab>
+      <md-tab label="Identificação" ng-disabled="Ctrl.inscricao.idInscricao != null || Ctrl.inscricao.idEvento == null">
+        <md-content class="md-padding">
+          <p>Por favor, entre com os dados abaixo:</p>
+          <md-input-container class="md-block">
+          <label>CPF</label>
+          <md-icon class="material-icons">person</md-icon>
+          <input ng-required="true" name="cpf" ng-minlength="11" ng-maxlength="11" ng-model="Ctrl.inscricao.cpf" onkeyup="this.value=this.value.replace(/[^\d]/,'')" />
+          <div class="hint">Apenas números</div>			          
+          <div ng-messages="form.cpf.$error">
+          	<div ng-message="required">CPF é obrigatório.</div>
+          	<div ng-message="minlength">CPF incorreto.</div>
+          	<div ng-message="maxlength">CPF incorreto.</div>
+          </div>
+        </md-input-container>
+          <section layout="row" layout-sm="column" layout-align="center center" layout-wrap>
+          	  <md-button ng-click="Ctrl.voltar2()" class="md-raised">&lArr; Voltar</md-button>
+		      <md-button name="button_avancar_step2" ng-click="Ctrl.avancar2()"
+		      ng-disabled="Ctrl.inscricao.idEvento == null || Ctrl.inscricao.cpf == null" 
+		       class="md-raised md-primary">Avançar &rArr;</md-button>
+	      </section>
+        </md-content>
+      </md-tab>
+      
+      <md-tab label="Dados complementares" ng-disabled="Ctrl.inscricao.idInscricao != null || Ctrl.inscricao.idEvento == null || Ctrl.inscricao.cpf == null || Ctrl.inscricao.nome == null || Ctrl.inscricao.email == null">
+        <md-content class="md-padding">
+          <p>Por favor, confira os dados abaixo:</p>
+          	<md-input-container class="md-block">
+          		<label>Nome</label>
+          		<md-icon class="material-icons">person</md-icon>
+          		<input ng-readonly="true" name="cpf" ng-model="Ctrl.inscricao.nome" />
+        	</md-input-container>
+        	<md-input-container class="md-block">
+          		<label>E-mail</label>
+          		<md-icon class="material-icons">mail</md-icon>
+          		<input ng-readonly="true" name="email" ng-model="Ctrl.inscricao.email" />
+        	</md-input-container>
+          <p>Selecione suas preferências:</p>
+          <md-input-container class="md-block">
+	          <label>Tamanho da camiseta</label>
+	          <md-icon class="material-icons">local_offer</md-icon>
+	          <md-select ng-required="true" name="tamanhoCamiseta" ng-model="Ctrl.inscricao.tamanhoCamiseta">
+	            <md-option ng-repeat="tamanho in Ctrl.tamanhosCamiseta" ng-value="tamanho.tamanho">
+	              {{tamanho.descricao}}
+	            </md-option>
+	          </md-select>
+	          <div ng-messages="form.tamanhoCamiseta.$error">
+	          	<div ng-message="required">Evento é obrigatório.</div>
+	          </div>
+          </md-input-container>
+          <section layout="row" layout-sm="column" layout-align="center center" layout-wrap>
+          	  <md-button ng-click="Ctrl.voltar3()" class="md-raised">&lArr; Voltar</md-button>
+		      <md-button name="button_avancar_step3" ng-click="Ctrl.avancar3()"
+		      ng-disabled="Ctrl.inscricao.idEvento == null || Ctrl.inscricao.cpf == null || Ctrl.inscricao.nome == null || Ctrl.inscricao.email == null || Ctrl.inscricao.tamanhoCamiseta == null" 
+		       class="md-raised md-primary">Avançar &rArr;</md-button>
+	      </section>
+        </md-content>
+      </md-tab>
+      <md-tab label="Confirmação" ng-disabled="Ctrl.inscricao.idInscricao == null">
+        <md-content class="md-padding">
+          <p>Parabéns <b>{{Ctrl.inscricao.nome}}</b>, inscrição nº {{Ctrl.inscricao.idInscricao}} realizada com sucesso!</p>
+          <p>A confirmação foi enviada para o e-mail <b>{{Ctrl.inscricao.email}}</b></p>
+        </md-content>
+      </md-tab>
+    </md-tabs>
+    </form>
+</md-content>

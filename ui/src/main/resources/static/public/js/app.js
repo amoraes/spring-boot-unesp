@@ -1,4 +1,4 @@
-angular.module('exemplo', ['ngMaterial', 'ngMessages', 'ngRoute', 'ngResource'])
+angular.module('exemplo-public', ['ngMaterial', 'ngMessages', 'ngRoute', 'ngResource'])
 .run(['$rootScope', '$log', function($rootScope, $log){
 	$log.debug('Inicializando Angular App Exemplo');
 	$rootScope.authenticated = false;
@@ -37,6 +37,10 @@ angular.module('exemplo', ['ngMaterial', 'ngMessages', 'ngRoute', 'ngResource'])
 	.when('/', {
         templateUrl: 'views/home.html',
         controller: 'HomeController as Ctrl'
+    })
+    .when('/inscricao', {
+        templateUrl: 'views/inscricao.html',
+        controller: 'InscricaoController as Ctrl'
     })
 	.otherwise({
 		redirectTo: '/'

@@ -1,5 +1,5 @@
 'use strict';
-var app = angular.module('exemplo');
+var app = angular.module('exemplo-public');
 app.controller('MainController', 
 	['$scope', '$rootScope', '$http', '$location', '$mdSidenav', '$mdDialog', '$mdMedia', '$log', 'Utils',
 	function ($scope, $rootScope, $http, $location, $mdSidenav,  $mdDialog, $mdMedia, $log, Utils) {
@@ -17,6 +17,7 @@ app.controller('MainController',
 		self.loadMenu = function(){
 			 self.menuItems = 
 				   [
+					    {"label": "Início", "icon": "home", "url": "/"},
 			        	{"label": "Inscrever-se", "icon": "assignment", "url": "/inscricao"},
 			        	{"label": "Administração", "icon": "lock", "url": "../login"},
 			       ];	 

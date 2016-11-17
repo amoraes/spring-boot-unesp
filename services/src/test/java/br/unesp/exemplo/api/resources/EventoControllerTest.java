@@ -68,7 +68,7 @@ public class EventoControllerTest {
 		when(eventoService.listar()).thenReturn(list);
 		
 		this.mockMvc
-			.perform(get(BASE_URL+"/",evento.getId())
+			.perform(get(BASE_URL+"/")
 				.accept(KGlobal.APPLICATION_JSON_UTF8))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$[0].idEvento", equalTo(new Long(evento.getId()).intValue())))

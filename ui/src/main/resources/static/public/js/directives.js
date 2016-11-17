@@ -1,4 +1,4 @@
-var app = angular.module('exemplo');
+var app = angular.module('exemplo-public');
 app.directive("compareTo", function() {
     return {
         require: "ngModel",
