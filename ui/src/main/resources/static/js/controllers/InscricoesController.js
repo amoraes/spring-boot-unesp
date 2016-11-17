@@ -41,6 +41,63 @@ app.controller('InscricoesController',
 				});	
 		}
 		
+		self.download = function(evento){
+			$log.debug('entering download');
+			var params = {};
+			params.idEvento = evento.idEvento;
+			InscricaoResource.list(params,
+				function(data){
+					//define o layout do pdf
+					var docDefinition = {
+					    content: [
+					      {
+					        text: 'Inscrições - Evento '+evento.titulo, style: 'title'
+					      },
+					      {
+					    	  text: ' '
+					      },
+					      {
+					        style: 'myTable',
+					        table: {
+					          widths: ['*', '*', '*', '*'],
+					          body: [
+					            [{text: 'Nome', style: 'header'}, {text: 'CPF', style: 'header'},
+					              {text: 'E-mail', style: 'header'}, {text: 'Camiseta', style: 'header'}
+					            ],
+					          ]
+					        }
+					      }
+					    ],
+					    styles: {
+					      title: {
+					    	bold: true,
+					    	color: '#000',
+					    	fontSize: 16,
+					    	alignment: 'center'
+					      },					    
+					      header: {
+					        bold: true,
+					        color: '#000',
+					        fontSize: 12
+					      },
+					      myTable: {
+					        color: '#666',
+					        fontSize: 10
+					      }
+					    }
+					  };
+					data.forEach(function(inscricao){
+						var line = [inscricao.nome, inscricao.cpf, inscricao.email, inscricao.tamanhoCamisetaDescricao];
+						docDefinition.content[2].table.body.push(line)
+					});
+					pdfMake.createPdf(docDefinition).open();
+				},
+				function(error){
+					Utils.exception(error);
+				}
+			);
+		}
+		
 		Utils.secureInit(self.init, [ CONFIG.ROLE_ADMIN ]);
 		
 }]);

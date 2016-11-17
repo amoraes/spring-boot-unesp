@@ -7,7 +7,7 @@
 		</md-input-container>
 		<div>
 			<md-list-item  ng-repeat="evento in Ctrl.eventos | orderBy: 'titulo' | filter:filtro "
-			ng-click="Ctrl.editar(evento.idEvento, false)" on-long-press="Ctrl.selecionar(evento.idEvento, $event)"	
+			ng-click="Ctrl.download(evento)"	
 			class="md-3-line" aria-label="Inscrições do evento {{evento.titulo}}">
 				<div class="md-list-item-text" >
 					<h3>{{ evento.titulo }}</h3>
