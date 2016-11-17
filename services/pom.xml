@@ -57,6 +57,16 @@
 	    	<groupId>com.zaxxer</groupId>
 	    	<artifactId>HikariCP</artifactId>
 		</dependency>
+		<!-- 		Envio de e-mail -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+		<!-- 		Utilizado para o template do e-mail -->
+		<dependency>
+		    <groupId>org.apache.velocity</groupId>
+		    <artifactId>velocity</artifactId>
+		</dependency>
 		<!-- Tomcat -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

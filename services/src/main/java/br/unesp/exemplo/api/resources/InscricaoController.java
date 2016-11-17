@@ -3,6 +3,7 @@ package br.unesp.exemplo.api.resources;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,7 +86,7 @@ public class InscricaoController {
 	}
 		
 	@RequestMapping(method = RequestMethod.POST)
-	public InscricaoVO inserir(@PathVariable Long idEvento, @RequestBody @Valid InscricaoVOPost inscricaoVO, BindingResult bindingResult) throws NotFoundException, ServiceValidationException{
+	public InscricaoVO inserir(@PathVariable Long idEvento, @RequestBody @Valid InscricaoVOPost inscricaoVO, BindingResult bindingResult) throws NotFoundException, ServiceValidationException, MessagingException{
 		if(bindingResult.hasErrors()){
 			throw new InvalidEntityException(InscricaoVOPost.class, bindingResult);
 		}
@@ -105,7 +106,7 @@ public class InscricaoController {
 	
 	//@Secured({ROLE_ADMINISTRADOR})
 	@RequestMapping(value = "/{idInscricao}", method = RequestMethod.PUT)
-	public InscricaoVO atualizar(@PathVariable Long idEvento, @PathVariable Long idInscricao, @RequestBody @Valid InscricaoVOPut inscricaoVO, BindingResult bindingResult) throws NotFoundException, ServiceValidationException{
+	public InscricaoVO atualizar(@PathVariable Long idEvento, @PathVariable Long idInscricao, @RequestBody @Valid InscricaoVOPut inscricaoVO, BindingResult bindingResult) throws NotFoundException, ServiceValidationException, MessagingException{
 		if(bindingResult.hasErrors()){
 			throw new InvalidEntityException(InscricaoVOPut.class, bindingResult);
 		}

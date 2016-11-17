@@ -2,6 +2,8 @@ package br.unesp.exemplo.services;
 
 import java.util.List;
 
+import javax.mail.MessagingException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import br.unesp.exemplo.entities.Inscricao;
 import br.unesp.exemplo.exceptions.NotFoundException;
 import br.unesp.exemplo.exceptions.ServiceValidationException;
 import br.unesp.exemplo.repositories.InscricaoRepository;
+import br.unesp.exemplo.utils.CustomMailSender;
 
 /**
  * Service para operações relacionadas a entidade Inscricao 
@@ -27,13 +30,18 @@ public class InscricaoService {
 	@Autowired
 	private InscricaoRepository repo;
 	
+	@Autowired
+	private CustomMailSender mailSender;
+	
 	
 	public Inscricao buscarPorId(long id) {
 		return repo.findOne(id);
 	}
 
-	public Inscricao salvar(Inscricao evento) throws ServiceValidationException {
-		return repo.save(evento);
+	public Inscricao salvar(Inscricao inscricao) throws ServiceValidationException, MessagingException {
+		Inscricao saved = repo.save(inscricao);
+		mailSender.sendConfirmacaoInscricao(saved);
+		return saved;
 	}
 
 	public void excluir(long id) throws NotFoundException{
