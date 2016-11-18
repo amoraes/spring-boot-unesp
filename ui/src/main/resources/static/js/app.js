@@ -3,6 +3,7 @@ angular.module('exemplo', ['ngMaterial', 'ngMessages', 'ngRoute', 'ngResource'])
 //Constantes a serem importadas em outros Services ou Controllers
 .constant("CONFIG", {
     "ROLE_ADMIN": "ROLE_UNESP.EXEMPLO_ADMINISTRADOR",
+    "ROLE_RELATORIOS": "ROLE_UNESP.EXEMPLO_RELATORIOS",
     "CONTEXT_PATH": "exemplo"
 })
 //Inicialização do App
@@ -80,6 +81,9 @@ angular.module('exemplo', ['ngMaterial', 'ngMessages', 'ngRoute', 'ngResource'])
     .when('/inscricoes', {
         templateUrl: 'views/inscricoes.html',
         controller: 'InscricoesController as Ctrl'
+    })
+    .when('/acessoNegado', {
+    	templateUrl: 'views/acessoNegado.html',
     })
     //Rota padrão
 	.otherwise({

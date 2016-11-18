@@ -26,6 +26,9 @@ app.controller('MainController',
 		self.loadMenu = function(){
 			 if(SessionService.hasRole(CONFIG.ROLE_ADMIN)){
 				 self.menuItems.push({"label": "Cadastro de Eventos", "icon": "settings", "url": "/eventos/listar"});
+			 }
+			 //relatório está disponível para admin e relatórios
+			 if(SessionService.hasRole(CONFIG.ROLE_ADMIN) || SessionService.hasRole(CONFIG.ROLE_RELATORIOS)){
 				 self.menuItems.push({"label": "Inscrições", "icon": "library_books", "url": "/inscricoes"});
 			 }
 			 Utils.wait(false);
@@ -48,8 +51,8 @@ app.controller('MainController',
 	    
 	    self.logout = function(ev) {
 	        var confirm = $mdDialog.confirm()
-	              .title('Desconectar')
-	              .textContent('Deseja sair da conta \''+$rootScope.user.name+'\' neste computador?')
+	              .title('Finalizar sessão')
+	              .textContent('Deseja finalizar sua sessão nesse sistema e retornar para a Central de Acessos?')
 	              .ariaLabel('Desconectar')
 	              .targetEvent(ev)
 	              .ok('Sim')

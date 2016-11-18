@@ -42,7 +42,6 @@ app.controller('InscricoesController',
 		}
 		
 		self.download = function(evento){
-			$log.debug('entering download');
 			var params = {};
 			params.idEvento = evento.idEvento;
 			InscricaoResource.list(params,
@@ -98,6 +97,6 @@ app.controller('InscricoesController',
 			);
 		}
 		
-		Utils.secureInit(self.init, [ CONFIG.ROLE_ADMIN ]);
+		Utils.secureInit(self.init, [ CONFIG.ROLE_ADMIN, CONFIG.ROLE_RELATORIOS ]);
 		
 }]);
