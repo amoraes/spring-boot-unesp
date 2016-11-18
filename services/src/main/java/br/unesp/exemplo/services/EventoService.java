@@ -2,8 +2,6 @@ package br.unesp.exemplo.services;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,8 +19,6 @@ import br.unesp.exemplo.repositories.EventoRepository;
 @Transactional //indica que usará transações neste serviço
 public class EventoService {
 	
-	private final Logger log = LoggerFactory.getLogger(EventoService.class);
-	
 	@Autowired
 	private EventoRepository repo;
 	
@@ -32,6 +28,19 @@ public class EventoService {
 	}
 
 	public Evento salvar(Evento evento) throws ServiceValidationException {
+		//verificar as datas
+		if(evento.getInicio().after(evento.getTermino())){
+			throw new ServiceValidationException("Data de início do evento não pode ser depois da data de término do evento");
+		}
+		if(evento.getInicioInscricao().after(evento.getInicio())){
+			throw new ServiceValidationException("Data de início das inscrições não pode ser depois da data de início do evento");
+		}
+		if(evento.getInicioInscricao().after(evento.getTerminoInscricao())){
+			throw new ServiceValidationException("Data de início das inscrições não pode ser depois da data de término das inscrições");
+		}
+		if(evento.getTerminoInscricao().after(evento.getTermino())){
+			throw new ServiceValidationException("Data de término das inscrições não pode ser depois da data de término do evento");
+		}
 		return repo.save(evento);
 	}
 

@@ -22,4 +22,6 @@ public interface InscricaoRepository extends JpaRepository<Inscricao, Long> {
 	
 	public Long countByEvento(Evento evento);
 	
+	public Inscricao findByEventoAndCpf(Evento evento, String cpf);
+	
 }

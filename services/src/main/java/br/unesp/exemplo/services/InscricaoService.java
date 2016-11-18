@@ -39,9 +39,17 @@ public class InscricaoService {
 	}
 
 	public Inscricao salvar(Inscricao inscricao) throws ServiceValidationException, MessagingException {
-		Inscricao saved = repo.save(inscricao);
-		mailSender.sendConfirmacaoInscricao(saved);
-		return saved;
+		//verifica se é uma nova inscrição (quando é atualização o Id vem preenchido)
+		if(inscricao.getId() == null){
+			//verificar se este usuário já não está inscrito
+			Inscricao inscricaoExistente = repo.findByEventoAndCpf(inscricao.getEvento(), inscricao.getCpf());
+			if(inscricaoExistente != null){
+				throw new ServiceValidationException(String.format("CPF %s já inscrito", inscricao.getCpf()));
+			}
+		}
+		Inscricao inscricaoSalva = repo.save(inscricao);
+		mailSender.sendConfirmacaoInscricao(inscricaoSalva);
+		return inscricaoSalva;
 	}
 
 	public void excluir(long id) throws NotFoundException{
