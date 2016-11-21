@@ -3,12 +3,14 @@ package br.unesp.exemplo.api.resources;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.unesp.exemplo.api.valueobjects.PessoaVO;
+import br.unesp.exemplo.webservices.RHWebService;
 
 /**
  * RESTful Resource Pessoas da API
@@ -18,6 +20,9 @@ import br.unesp.exemplo.api.valueobjects.PessoaVO;
 @RequestMapping("/pessoas")
 public class PessoasController {
 	
+	@Autowired
+	private RHWebService rhWebService;
+	
 	/**
 	 * Buscar uma pessoa, única opção neste caso é CPF
 	 * @return
@@ -25,9 +30,9 @@ public class PessoasController {
 	@RequestMapping(method = RequestMethod.GET)
 	public List<PessoaVO> filtrar(@RequestParam("cpf") String cpf){
 		List<PessoaVO> list = new ArrayList<>();
-		//TODO buscar no serviço do RH ou Acadêmico
-		if(cpf.equals("30568397851")){
-			list.add(new PessoaVO("Alessandro Moraes", "amoraes@feb.unesp.br", "30568397851"));
+		PessoaVO pessoa = rhWebService.buscarPessoaPorCPF(cpf);
+		if(pessoa != null){
+			list.add(pessoa);
 		}
 		return list;
 	}

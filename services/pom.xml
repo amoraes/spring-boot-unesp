@@ -57,6 +57,12 @@
 	    	<groupId>com.zaxxer</groupId>
 	    	<artifactId>HikariCP</artifactId>
 		</dependency>
+		<!-- Utilitário para chamadas via REST simplificadas -->
+		<dependency>
+			<groupId>com.mashape.unirest</groupId>
+			<artifactId>unirest-java</artifactId>
+			<version>1.4.9</version>
+		</dependency>
 		<!-- 		Envio de e-mail -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
