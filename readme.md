@@ -33,4 +33,5 @@ O sistema possui dois módulos:
 
 [Central de Acessos (Documentação da API)](https://centraldev.unesp.br/central-services/docs/)
 
+[UnespAuth (Documentação da API)](https://centraldev.unesp.br/docs/)
 		
