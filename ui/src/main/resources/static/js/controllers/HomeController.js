@@ -13,6 +13,6 @@ app.controller('HomeController',
 			self.ready = true;
 		}
 		
-		Utils.secureInit(self.init, [ CONFIG.ROLE_ADMIN ])
+		Utils.secureInit(self.init, [ CONFIG.ROLE_ADMIN, CONFIG.ROLE_RELATORIOS ])
 	}
 ]);
