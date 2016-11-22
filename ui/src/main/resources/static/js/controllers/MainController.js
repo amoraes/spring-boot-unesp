@@ -12,11 +12,13 @@ app.controller('MainController',
 	    self.ready = false;
 	    
 	    self.init = function(){
+	    	Utils.wait(true);
 	    	//verifica se é página pública
 	    	SessionService.login().then(
     			function(data){
     				self.loadMenu();
     				self.ready = true;
+    				Utils.wait(false);
     			},    			
     			function(error){
     				window.location = 'login';
@@ -24,6 +26,7 @@ app.controller('MainController',
 	    }
 	    
 		self.loadMenu = function(){
+			self.menuItems.push({"label": "Início", "icon": "home", "url": "/"});
 			 if(SessionService.hasRole(CONFIG.ROLE_ADMIN)){
 				 self.menuItems.push({"label": "Cadastro de Eventos", "icon": "settings", "url": "/eventos/listar"});
 			 }
