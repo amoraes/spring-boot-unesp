@@ -2,8 +2,8 @@
 angular.module('exemplo', ['ngMaterial', 'ngMessages', 'ngRoute', 'ngResource'])
 //Constantes a serem importadas em outros Services ou Controllers
 .constant("CONFIG", {
-    "ROLE_ADMIN": "ROLE_UNESP.EXEMPLO_ADMINISTRADOR",
-    "ROLE_RELATORIOS": "ROLE_UNESP.EXEMPLO_RELATORIOS",
+    "ROLE_ADMIN": "ROLE_UNESP.SISTEMA-EXEMPLO-SPRING-BOOT_ADMINISTRADOR",
+    "ROLE_RELATORIOS": "ROLE_UNESP.SISTEMA-EXEMPLO-SPRING-BOOT_RELATORIOS",
     "CONTEXT_PATH": "exemplo"
 })
 //Inicialização do App
@@ -30,9 +30,19 @@ angular.module('exemplo', ['ngMaterial', 'ngMessages', 'ngRoute', 'ngResource'])
         }
     }
 }])
-//Registrando o interceptor
+//Interceptor para definir o tempo padrão de timeout das requisições http
+.factory('TimeoutHttpIntercept', [function () {
+    return {
+      'request': function(config) {
+        config.timeout = 20000;
+        return config;
+      }
+    };
+}])
+//Registrando os interceptors
 .config(['$httpProvider', function($httpProvider) {
 	$httpProvider.interceptors.push('RedirectInterceptor');
+	$httpProvider.interceptors.push('TimeoutHttpIntercept');
 }])
 //Configurações de localização de data para dd/MM/yyyy e português
 .config(['$mdDateLocaleProvider',function($mdDateLocaleProvider) {

@@ -14,6 +14,9 @@ O sistema possui dois módulos:
 * Criar um banco de dados utilizando o script createdb.sh
 * rodar os comandos *mvn spring-boot:run* nas pastas *ui* e *services*
 
+##Usuário
+* Para acessar a área administrativa, utilize o usuário **silva.sauro** e senha **Abc123**
+
 ##Links úteis
 [Spring Boot Docs + Tutoriais](https://spring.io/docs)
 

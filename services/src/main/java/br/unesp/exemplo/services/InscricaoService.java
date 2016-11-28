@@ -38,7 +38,7 @@ public class InscricaoService {
 		return repo.findOne(id);
 	}
 
-	public Inscricao salvar(Inscricao inscricao) throws ServiceValidationException, MessagingException {
+	public Inscricao salvar(Inscricao inscricao) throws ServiceValidationException {
 		//verifica se é uma nova inscrição (quando é atualização o Id vem preenchido)
 		if(inscricao.getId() == null){
 			//verificar se este usuário já não está inscrito
@@ -48,7 +48,11 @@ public class InscricaoService {
 			}
 		}
 		Inscricao inscricaoSalva = repo.save(inscricao);
-		mailSender.sendConfirmacaoInscricao(inscricaoSalva);
+		try{
+			mailSender.sendConfirmacaoInscricao(inscricaoSalva);
+		}catch (Exception e) {
+			log.error("Erro ao enviar o e-mail de confirmação", e);
+		}
 		return inscricaoSalva;
 	}
 
