@@ -14,7 +14,9 @@ O sistema possui dois módulos:
 * Criar um banco de dados utilizando o script createdb.sh
 * rodar os comandos *mvn spring-boot:run* nas pastas *ui* e *services*
 
-##Usuário
+##Como acessar
+* URL da área pública: http://localhost:9001/exemplo/public/
+* URL da área administrativa: http://localhost:9001/exemplo/
 * Para acessar a área administrativa, utilize o usuário **silva.sauro** e senha **Abc123**
 
 ##Links úteis
